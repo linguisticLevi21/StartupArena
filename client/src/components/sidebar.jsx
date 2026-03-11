@@ -1,45 +1,73 @@
-import { Search, Building2 } from "lucide-react";
+import { useState } from "react";
+import { Search } from "lucide-react";
+import CompanyLogo from "./CompanyLogo";
 
 function Sidebar({ startups, onSelect, selected }) {
+  const [query, setQuery] = useState("");
+
+  const filtered = startups?.filter((s) =>
+    s.name.toLowerCase().includes(query.toLowerCase()) ||
+    (s.city && s.city.toLowerCase().includes(query.toLowerCase()))
+  );
+
   return (
-    <div className="w-[400px] h-full bg-[#0a0a0a]/90 backdrop-blur-2xl border-r border-white/10 flex flex-col z-[500] shadow-2xl relative">
-      <div className="p-6 border-b border-white/10 shrink-0">
-        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 mb-6">
-          Startups
-        </h2>
-        
+    <div className="w-[360px] h-full bg-[#0a0a0a]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col z-[500] shadow-2xl shrink-0">
+
+      {/* Header */}
+      <div className="p-5 border-b border-white/10 shrink-0">
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="text-lg font-bold text-white">Startups</h2>
+          <span className="text-xs text-gray-500 font-medium">
+            {filtered?.length || 0} companies
+          </span>
+        </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input 
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <input
             type="text"
-            placeholder="Search companies..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-gray-200 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-colors placeholder:text-gray-500"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search companies or cities..."
+            className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-gray-200 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-colors placeholder:text-gray-600"
           />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 custom-scrollbar">
-        {startups?.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onSelect(s)}
-            className={`w-full text-left p-4 rounded-xl transition-all duration-200 border flex items-start gap-4 ${
-              selected?.id === s.id 
-                ? "bg-white/10 border-white/20 shadow-lg scale-[1.02]" 
-                : "bg-transparent border-transparent hover:bg-white/5 hover:border-white/10"
-            }`}
-          >
-            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-              <Building2 className="w-5 h-5 text-gray-400" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-100">{s.name}</h3>
-              <p className="text-sm text-gray-500 line-clamp-1 mt-1">
-                {s.roles?.length || 0} open roles
-              </p>
-            </div>
-          </button>
-        ))}
+      {/* Company list */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+        {filtered?.map((s) => {
+          const isSelected = selected?.id === s.id;
+          return (
+            <button
+              key={s.id}
+              onClick={() => onSelect(s)}
+              className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 border flex items-center gap-3 group ${
+                isSelected
+                  ? "bg-white/10 border-white/20 shadow-md"
+                  : "bg-transparent border-transparent hover:bg-white/5 hover:border-white/10"
+              }`}
+            >
+              {/* Real logo via Clearbit — falls back to initial badge */}
+              <CompanyLogo domain={s.domain} name={s.name} size={38} />
+
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p className={`font-semibold text-sm truncate ${isSelected ? "text-white" : "text-gray-200 group-hover:text-white"}`}>
+                  {s.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate mt-0.5">
+                  {s.roles?.length || 0} open roles · {s.city}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+
+        {filtered?.length === 0 && (
+          <div className="text-center py-12 text-gray-600 text-sm">
+            No companies found for "{query}"
+          </div>
+        )}
       </div>
     </div>
   );
