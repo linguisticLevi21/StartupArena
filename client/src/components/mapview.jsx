@@ -3,13 +3,19 @@ import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Custom modern marker icon
-const customIcon = new L.DivIcon({
-  className: "custom-marker",
-  html: `<div class="w-4 h-4 rounded-full border-2 border-white bg-white/80 shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-transform hover:scale-150 duration-300 backdrop-blur-sm"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 8]
-});
+// Function to generate dynamic icon with logo
+const createCustomIcon = (logoUrl, name) => {
+  return new L.DivIcon({
+    className: "custom-marker bg-transparent border-none",
+    html: `
+      <div class="relative group cursor-pointer w-8 h-8 rounded-xl overflow-hidden bg-[#111111] border border-white/20 shadow-lg hover:border-white/80 hover:scale-110 transition-all duration-300 flex items-center justify-center p-1" title="${name}">
+        <img src="${logoUrl}" alt="${name}" class="w-full h-full object-contain rounded-[6px]" onerror="this.src='https://ui-avatars.com/api/?name=${name[0]}&background=random'" />
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16] // Center the marker over the coordinate
+  });
+};
 
 function MapController({ center, zoom }) {
   const map = useMap();
@@ -20,6 +26,11 @@ function MapController({ center, zoom }) {
 }
 
 function MapView({ startups, onSelect, center, zoom }) {
+  // Allow the panel to open on select
+  const handleMarkerClick = (s) => {
+    onSelect(s); 
+  };
+
   return (
     <div className="flex-1 h-screen relative bg-[#0a0a0a] z-0">
       <MapContainer
@@ -40,9 +51,9 @@ function MapView({ startups, onSelect, center, zoom }) {
           <Marker
             key={s.id}
             position={[s.lat, s.lng]}
-            icon={customIcon}
+            icon={createCustomIcon(s.logo, s.name)}
             eventHandlers={{
-              click: () => onSelect(s),
+              click: () => handleMarkerClick(s),
             }}
           />
         ))}

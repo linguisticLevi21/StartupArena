@@ -17,7 +17,7 @@ function DashboardPage() {
       case "bangalore": return { center: [12.9716, 77.5946], zoom: 12 };
       case "delhi": return { center: [28.4595, 77.0266], zoom: 11 }; // NCR area
       case "hyderabad": return { center: [17.4436, 78.3496], zoom: 12 }; // Tech area
-      default: return { center: [20.5937, 78.9629], zoom: 5 }; // Center of India
+      default: return { center: [12.9716, 77.5946], zoom: 12 }; // Default to Bangalore (matches reference site)
     }
   }, [location.search]);
 
