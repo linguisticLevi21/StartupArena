@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, ZoomControl, useMap } from "react-leaflet";
+import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -10,15 +11,24 @@ const customIcon = new L.DivIcon({
   iconAnchor: [8, 8]
 });
 
-function MapView({ startups, onSelect }) {
+function MapController({ center, zoom }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, zoom, { duration: 1.5 });
+  }, [center, zoom, map]);
+  return null;
+}
+
+function MapView({ startups, onSelect, center, zoom }) {
   return (
     <div className="flex-1 h-screen relative bg-[#0a0a0a] z-0">
       <MapContainer
-        center={[12.9352, 77.6245]} // Centered roughly on Koramangala
-        zoom={12}
+        center={center || [12.9352, 77.6245]}
+        zoom={zoom || 12}
         zoomControl={false}
         style={{ height: "100%", width: "100%", background: "#000000" }}
       >
+        <MapController center={center || [12.9352, 77.6245]} zoom={zoom || 12} />
         <ZoomControl position="bottomright" />
         {/* Dark mode sleek tiles from CartoDB */}
         <TileLayer 
